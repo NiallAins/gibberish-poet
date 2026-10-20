@@ -238,9 +238,19 @@ function generateWord() {
     }
 }
 
+let debounce = false;
 function generatePoem(seed) {
+    if (debounce) {
+        return;
+    } else {
+        debounce = true;
+        setTimeout(() => debounce = false, 500);
+    }
+
     if (seed) {
         Math.randSetSeed(parseInt(seed.toLowerCase(), 36));
+    } else {
+        seed = Math._rng[3].toString(36).toUpperCase();
     }
     const SEED = Math._rng[3];
     let lexicon = [];
@@ -280,16 +290,18 @@ function generatePoem(seed) {
                 ${ Math.rand(lexicon) }?
             </button>
             <input
+                id="seed"
                 class="seed"
                 onfocus="event.target.select()"
-                onblur="generatePoem(event.target.value)"
+                onblur="event.target.value !== '${ seed }' ? generatePoem(event.target.value) : ''"
                 autocomplete="off"
                 spellcheck="false"
-                onkeydown="event.key === 'Enter' ? generatePoem(event.target.value) : ''"
-                value="${ SEED.toString(36).toUpperCase() }"
+                onkeydown="event.key === 'Enter' && event.target.value !== '${ seed }' ? generatePoem(event.target.value) : ''"
+                value="${ seed }"
             />
         </div>
     `;
+    document.getElementById('seed').focus();
 }
 
 // Randomly add punction and formatting
